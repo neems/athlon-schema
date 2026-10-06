@@ -1,0 +1,33 @@
+# Deliberately invalid plan. Expected errors: E101, E102, E104, E107.
+spec_version: "0.1.0"
+framework_ref: "NIST AI 200-2 ipd (2026-08)"
+id: broken
+title: "Broken fixture"
+lifecycle_stage: build_use
+system: {name: Bot, description: A bot.}
+goals:
+  q1: A goal.
+  q2: ""
+characteristics:
+  - {id: safe, kind: trustworthiness}
+blocks:
+  - id: b1
+    characteristics: [safe]
+    definition: d
+    evidence_required: e
+    measures: [{id: m1, unit: proportion, direction: neutral}]
+  - id: orphan
+    characteristics: [safe]
+    definition: d
+    evidence_required: e
+    measures: [{id: m2, unit: proportion, direction: neutral}]
+events:
+  - id: e1
+    type: benchmark
+    setting: controlled
+    blocks: [b1, no_such_block]
+    tools: [t1, no_such_tool]
+toolbox:
+  - {id: t1, kind: eval_harness, ref: {name: x}}
+interrogation:
+  - {id: i1, question: "Valid?"}

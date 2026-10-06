@@ -1,0 +1,245 @@
+{
+  "$defs": {
+    "Environment": {
+      "additionalProperties": false,
+      "description": "The configuration under which the observation was made.",
+      "properties": {
+        "config_hash": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Hash of the run configuration.",
+          "title": "Config Hash"
+        },
+        "extensions": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Free-form data beyond the NIST AI 200-2 ipd draft. The only place where unspecified fields are allowed.",
+          "title": "Extensions"
+        },
+        "model": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Underlying model, if any.",
+          "title": "Model"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Version of the system or model.",
+          "title": "Version"
+        }
+      },
+      "title": "Environment",
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "description": "Provenance of the raw data a record was derived from.",
+      "properties": {
+        "adapter": {
+          "description": "Adapter type that produced the record.",
+          "title": "Adapter",
+          "type": "string"
+        },
+        "adapter_version": {
+          "description": "Version of the adapter.",
+          "title": "Adapter Version",
+          "type": "string"
+        },
+        "extensions": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Free-form data beyond the NIST AI 200-2 ipd draft. The only place where unspecified fields are allowed.",
+          "title": "Extensions"
+        },
+        "sha256": {
+          "description": "SHA-256 hex digest of the raw source file.",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "uri": {
+          "description": "Location of the raw source file.",
+          "title": "Uri",
+          "type": "string"
+        }
+      },
+      "required": [
+        "uri",
+        "sha256",
+        "adapter",
+        "adapter_version"
+      ],
+      "title": "Source",
+      "type": "object"
+    },
+    "Subject": {
+      "additionalProperties": false,
+      "description": "What was observed, e.g. an episode for an agentic system.",
+      "properties": {
+        "extensions": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Free-form data beyond the NIST AI 200-2 ipd draft. The only place where unspecified fields are allowed.",
+          "title": "Extensions"
+        },
+        "id": {
+          "description": "Identifier of the subject within its source.",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind of subject, e.g. 'episode', 'test_case', 'participant'.",
+          "title": "Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "id"
+      ],
+      "title": "Subject",
+      "type": "object"
+    }
+  },
+  "$id": "https://neems.github.io/athlon-schema/schema/0.1/evidence.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "A single observation of one measure, tied to an Event, Tool and Block.",
+  "properties": {
+    "block": {
+      "description": "Id of the Block the observation is evidence for.",
+      "title": "Block",
+      "type": "string"
+    },
+    "collected_at": {
+      "description": "When the observation was collected.",
+      "format": "date-time",
+      "title": "Collected At",
+      "type": "string"
+    },
+    "conditions": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "description": "Level of each Event condition factor under which this was observed.",
+      "title": "Conditions",
+      "type": "object"
+    },
+    "environment": {
+      "$ref": "#/$defs/Environment",
+      "description": "Run configuration."
+    },
+    "event": {
+      "description": "Id of the Event that produced the observation.",
+      "title": "Event",
+      "type": "string"
+    },
+    "extensions": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Free-form data beyond the NIST AI 200-2 ipd draft. The only place where unspecified fields are allowed.",
+      "title": "Extensions"
+    },
+    "measure": {
+      "description": "Id of the measure within the Block.",
+      "title": "Measure",
+      "type": "string"
+    },
+    "source": {
+      "$ref": "#/$defs/Source",
+      "description": "Provenance of the raw data."
+    },
+    "subject": {
+      "$ref": "#/$defs/Subject",
+      "description": "What was observed."
+    },
+    "tool": {
+      "description": "Id of the Tool used.",
+      "title": "Tool",
+      "type": "string"
+    },
+    "value": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "integer"
+        },
+        {
+          "type": "number"
+        },
+        {
+          "type": "string"
+        }
+      ],
+      "description": "Observed value.",
+      "title": "Value"
+    }
+  },
+  "required": [
+    "event",
+    "tool",
+    "block",
+    "measure",
+    "value",
+    "subject",
+    "source",
+    "collected_at"
+  ],
+  "title": "TEVV-Athlon evidence record (evidence/*.jsonl line)",
+  "type": "object"
+}

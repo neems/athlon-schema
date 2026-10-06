@@ -1,0 +1,119 @@
+{
+  "$defs": {
+    "InterrogationResponse": {
+      "additionalProperties": false,
+      "description": "The answer to one pre-registered interrogation question.",
+      "properties": {
+        "extensions": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Free-form data beyond the NIST AI 200-2 ipd draft. The only place where unspecified fields are allowed.",
+          "title": "Extensions"
+        },
+        "question": {
+          "description": "Id of the interrogation question in the plan.",
+          "title": "Question",
+          "type": "string"
+        },
+        "response": {
+          "description": "The answer, with reference to the evidence.",
+          "title": "Response",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/InterrogationStatus",
+          "description": "How fully the question is addressed."
+        }
+      },
+      "required": [
+        "question",
+        "status",
+        "response"
+      ],
+      "title": "InterrogationResponse",
+      "type": "object"
+    },
+    "InterrogationStatus": {
+      "description": "How fully a Stage 4 review addresses a pre-registered interrogation question.",
+      "enum": [
+        "addressed",
+        "partially_addressed",
+        "not_addressed"
+      ],
+      "title": "InterrogationStatus",
+      "type": "string"
+    }
+  },
+  "$id": "https://neems.github.io/athlon-schema/schema/0.1/review.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Human Stage 4 synthesis: interrogation answers, limitations and validity boundary.",
+  "properties": {
+    "athlon": {
+      "description": "Id of the Athlon plan being reviewed.",
+      "title": "Athlon",
+      "type": "string"
+    },
+    "extensions": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Free-form data beyond the NIST AI 200-2 ipd draft. The only place where unspecified fields are allowed.",
+      "title": "Extensions"
+    },
+    "framework_ref": {
+      "description": "Framework edition the review follows.",
+      "title": "Framework Ref",
+      "type": "string"
+    },
+    "interrogation": {
+      "description": "Responses to pre-registered interrogation questions.",
+      "items": {
+        "$ref": "#/$defs/InterrogationResponse"
+      },
+      "title": "Interrogation",
+      "type": "array"
+    },
+    "limitations": {
+      "description": "Known limitations of the evaluation.",
+      "items": {
+        "type": "string"
+      },
+      "title": "Limitations",
+      "type": "array"
+    },
+    "spec_version": {
+      "description": "Version (semver) of the tevv-athlon spec used.",
+      "title": "Spec Version",
+      "type": "string"
+    },
+    "validity_boundary": {
+      "description": "Conditions under which the results are expected to hold.",
+      "title": "Validity Boundary",
+      "type": "string"
+    }
+  },
+  "required": [
+    "spec_version",
+    "framework_ref",
+    "athlon",
+    "validity_boundary"
+  ],
+  "title": "TEVV-Athlon review (review.yaml)",
+  "type": "object"
+}

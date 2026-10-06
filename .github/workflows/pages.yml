@@ -1,0 +1,52 @@
+name: Pages
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: pages
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build site
+        run: |
+          mkdir -p _site/schema/0.1
+          cp spec/schema/*.schema.json _site/schema/0.1/
+          mkdir -p _site/examples/ambient-scribe-illustrative
+          cp spec/examples/ambient-scribe-illustrative/overview.html \
+            _site/examples/ambient-scribe-illustrative/index.html
+          cat > _site/index.html <<'EOF'
+          <!doctype html>
+          <html lang="en">
+          <head><meta charset="utf-8"><meta name="color-scheme" content="only light"><title>athlon-schema</title></head>
+          <body>
+          <h1>athlon-schema</h1>
+          <p>JSON Schemas for TEVV-Athlon evaluation files, spec 0.1 (draft).
+          Not affiliated with or endorsed by NIST.</p>
+          <ul>
+          <li><a href="schema/0.1/athlon.schema.json">athlon.schema.json</a></li>
+          <li><a href="schema/0.1/evidence.schema.json">evidence.schema.json</a></li>
+          <li><a href="schema/0.1/review.schema.json">review.schema.json</a></li>
+          </ul>
+          <p><a href="examples/ambient-scribe-illustrative/">Illustrative fully populated example</a>
+          (NOT REAL RESULTS / FOR EDUCATIONAL PURPOSES)</p>
+          <p>Source: <a href="https://github.com/neems/athlon-schema">github.com/neems/athlon-schema</a></p>
+          </body>
+          </html>
+          EOF
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - id: deployment
+        uses: actions/deploy-pages@v4

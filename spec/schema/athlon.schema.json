@@ -1,0 +1,774 @@
+{
+  "$defs": {
+    "Adapter": {
+      "additionalProperties": false,
+      "description": "How a Tool's raw output is turned into evidence records.",
+      "properties": {
+        "extensions": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Free-form data beyond the NIST AI 200-2 ipd draft. The only place where unspecified fields are allowed.",
+          "title": "Extensions"
+        },
+        "map": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Mapping from source metric name to the measure id it reports.",
+          "title": "Map",
+          "type": "object"
+        },
+        "type": {
+          "description": "Adapter type, e.g. 'promptfoo' or 'tabular'.",
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type"
+      ],
+      "title": "Adapter",
+      "type": "object"
+    },
+    "Block": {
+      "additionalProperties": false,
+      "description": "A Metrology Block: a key concept or metric the evaluation aims to assess.",
+      "properties": {
+        "characteristics": {
+          "description": "Ids of the characteristics this Block provides evidence for.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Characteristics",
+          "type": "array"
+        },
+        "definition": {
+          "description": "Precise definition of the concept being measured.",
+          "title": "Definition",
+          "type": "string"
+        },
+        "evidence_required": {
+          "description": "Definition of the evidence the Block needs.",
+          "title": "Evidence Required",
+          "type": "string"
+        },
+        "extensions": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Free-form data beyond the NIST AI 200-2 ipd draft. The only place where unspecified fields are allowed.",
+          "title": "Extensions"
+        },
+        "id": {
+          "description": "Block identifier, unique within the plan.",
+          "title": "Id",
+          "type": "string"
+        },
+        "measures": {
+          "description": "Measures reported for this Block.",
+          "items": {
+            "$ref": "#/$defs/Measure"
+          },
+          "title": "Measures",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "characteristics",
+        "definition",
+        "evidence_required",
+        "measures"
+      ],
+      "title": "Block",
+      "type": "object"
+    },
+    "Characteristic": {
+      "additionalProperties": false,
+      "description": "A system attribute (SA) or trustworthiness characteristic (TC) being evaluated.",
+      "properties": {
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "What the characteristic means here.",
+          "title": "Description"
+        },
+        "extensions": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Free-form data beyond the NIST AI 200-2 ipd draft. The only place where unspecified fields are allowed.",
+          "title": "Extensions"
+        },
+        "id": {
+          "description": "Identifier. For an AI RMF trustworthiness characteristic it must be one of the vocabulary TC slugs (checked by the validator); for a system attribute it is free.",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "$ref": "#/$defs/CharacteristicKind",
+          "description": "Whether this is an AI RMF trustworthiness characteristic or a system attribute."
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Human-readable name.",
+          "title": "Name"
+        }
+      },
+      "required": [
+        "id",
+        "kind"
+      ],
+      "title": "Characteristic",
+      "type": "object"
+    },
+    "CharacteristicKind": {
+      "description": "Whether a plan characteristic is an AI RMF TC or a free system attribute (SA).",
+      "enum": [
+        "trustworthiness",
+        "system_attribute"
+      ],
+      "title": "CharacteristicKind",
+      "type": "string"
+    },
+    "Event": {
+      "additionalProperties": false,
+      "description": "An activity that produces evidence for one or more Blocks.",
+      "properties": {
+        "blocks": {
+          "description": "Ids of the Blocks this Event produces evidence for.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Blocks",
+          "type": "array"
+        },
+        "conditions": {
+          "additionalProperties": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "description": "Experimental factors and their levels, e.g. {framing: [test, realistic]}. Evidence records tag observations with one level per factor.",
+          "title": "Conditions",
+          "type": "object"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "What the Event involves.",
+          "title": "Description"
+        },
+        "extensions": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Free-form data beyond the NIST AI 200-2 ipd draft. The only place where unspecified fields are allowed.",
+          "title": "Extensions"
+        },
+        "id": {
+          "description": "Event identifier, unique within the plan.",
+          "title": "Id",
+          "type": "string"
+        },
+        "setting": {
+          "$ref": "#/$defs/Setting",
+          "description": "How realistic the Event setting is."
+        },
+        "tools": {
+          "description": "Ids of Toolbox tools used in this Event.",
+          "items": {
+            "type": "string"
+          },
+          "title": "Tools",
+          "type": "array"
+        },
+        "type": {
+          "$ref": "#/$defs/EventType",
+          "description": "Kind of Event."
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "setting",
+        "blocks",
+        "tools"
+      ],
+      "title": "Event",
+      "type": "object"
+    },
+    "EventType": {
+      "description": "Kinds of evidence-producing Events named by the draft.",
+      "enum": [
+        "benchmark",
+        "red_teaming",
+        "user_testing",
+        "field_testing",
+        "other"
+      ],
+      "title": "EventType",
+      "type": "string"
+    },
+    "Goals": {
+      "additionalProperties": false,
+      "description": "Answers to the seven 'Questions for Articulating TEVV-Athlon Goals' (draft 2.1).\n\nAll are optional here; the validator requires q1 and q2.",
+      "properties": {
+        "extensions": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Free-form data beyond the NIST AI 200-2 ipd draft. The only place where unspecified fields are allowed.",
+          "title": "Extensions"
+        },
+        "q1": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Q1: the goals, stated with no jargon.",
+          "title": "Q1"
+        },
+        "q2": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Q2: who cares, and what difference the results make.",
+          "title": "Q2"
+        },
+        "q3": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Q3: approximate time and cost.",
+          "title": "Q3"
+        },
+        "q4": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Q4: resources needed.",
+          "title": "Q4"
+        },
+        "q5": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Q5: existing TEVV techniques built on.",
+          "title": "Q5"
+        },
+        "q6": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Q6: what leads to success (may inform measure targets).",
+          "title": "Q6"
+        },
+        "q7": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Q7: anticipated challenges.",
+          "title": "Q7"
+        }
+      },
+      "title": "Goals",
+      "type": "object"
+    },
+    "InterrogationQuestion": {
+      "additionalProperties": false,
+      "description": "A pre-registered Stage 4 question about measurement validity.",
+      "properties": {
+        "extensions": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Free-form data beyond the NIST AI 200-2 ipd draft. The only place where unspecified fields are allowed.",
+          "title": "Extensions"
+        },
+        "id": {
+          "description": "Question identifier, unique within the plan.",
+          "title": "Id",
+          "type": "string"
+        },
+        "question": {
+          "description": "The question to answer after testing.",
+          "title": "Question",
+          "type": "string"
+        },
+        "rationale": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Why the question matters.",
+          "title": "Rationale"
+        }
+      },
+      "required": [
+        "id",
+        "question"
+      ],
+      "title": "InterrogationQuestion",
+      "type": "object"
+    },
+    "LifecycleStage": {
+      "description": "AI lifecycle stages (draft Fig. 3, OECD-based taxonomy).",
+      "enum": [
+        "plan_design",
+        "collect_process_data",
+        "build_use",
+        "deploy",
+        "operate_monitor"
+      ],
+      "title": "LifecycleStage",
+      "type": "string"
+    },
+    "Measure": {
+      "additionalProperties": false,
+      "description": "A quantity reported for a Block. Targets are optional and never a pass/fail.",
+      "properties": {
+        "direction": {
+          "$ref": "#/$defs/MeasureDirection",
+          "description": "Which direction of the value is preferable."
+        },
+        "extensions": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Free-form data beyond the NIST AI 200-2 ipd draft. The only place where unspecified fields are allowed.",
+          "title": "Extensions"
+        },
+        "id": {
+          "description": "Identifier, unique within its Block.",
+          "title": "Id",
+          "type": "string"
+        },
+        "target": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Optional reference value derived from goal Q6, shown alongside the estimate. It is not a pass/fail threshold.",
+          "title": "Target"
+        },
+        "unit": {
+          "description": "Unit of the measure, e.g. 'proportion' or 'seconds'.",
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "unit",
+        "direction"
+      ],
+      "title": "Measure",
+      "type": "object"
+    },
+    "MeasureDirection": {
+      "description": "Which direction of a measure value is preferable (no pass/fail implied).",
+      "enum": [
+        "higher_is_better",
+        "lower_is_better",
+        "neutral"
+      ],
+      "title": "MeasureDirection",
+      "type": "string"
+    },
+    "Setting": {
+      "description": "How realistic the setting of an Event is.",
+      "enum": [
+        "controlled",
+        "semi_realistic",
+        "real_world"
+      ],
+      "title": "Setting",
+      "type": "string"
+    },
+    "System": {
+      "additionalProperties": false,
+      "description": "The AI system under evaluation.",
+      "properties": {
+        "description": {
+          "description": "Plain-language description of the system.",
+          "title": "Description",
+          "type": "string"
+        },
+        "extensions": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Free-form data beyond the NIST AI 200-2 ipd draft. The only place where unspecified fields are allowed.",
+          "title": "Extensions"
+        },
+        "name": {
+          "description": "Name of the AI system under evaluation.",
+          "title": "Name",
+          "type": "string"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Version of the system evaluated.",
+          "title": "Version"
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ],
+      "title": "System",
+      "type": "object"
+    },
+    "Tool": {
+      "additionalProperties": false,
+      "description": "A Toolbox entry: a method or instrument used to elicit, collect or analyze data.",
+      "properties": {
+        "adapter": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Adapter"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Adapter that normalizes this tool's output into evidence."
+        },
+        "extensions": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Free-form data beyond the NIST AI 200-2 ipd draft. The only place where unspecified fields are allowed.",
+          "title": "Extensions"
+        },
+        "id": {
+          "description": "Tool identifier, unique within the Toolbox.",
+          "title": "Id",
+          "type": "string"
+        },
+        "kind": {
+          "description": "Kind of tool, e.g. 'eval_harness', 'questionnaire', 'annotation_schema'.",
+          "title": "Kind",
+          "type": "string"
+        },
+        "ref": {
+          "$ref": "#/$defs/ToolRef",
+          "description": "Reference to the external tool or method."
+        }
+      },
+      "required": [
+        "id",
+        "kind",
+        "ref"
+      ],
+      "title": "Tool",
+      "type": "object"
+    },
+    "ToolRef": {
+      "additionalProperties": false,
+      "description": "Reference to the external method or instrument a Tool uses.",
+      "properties": {
+        "extensions": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Free-form data beyond the NIST AI 200-2 ipd draft. The only place where unspecified fields are allowed.",
+          "title": "Extensions"
+        },
+        "name": {
+          "description": "Name of the tool, instrument or method.",
+          "title": "Name",
+          "type": "string"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Where the tool can be found.",
+          "title": "Url"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Version of the tool.",
+          "title": "Version"
+        }
+      },
+      "required": [
+        "name"
+      ],
+      "title": "ToolRef",
+      "type": "object"
+    }
+  },
+  "$id": "https://neems.github.io/athlon-schema/schema/0.1/athlon.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "A TEVV-Athlon plan covering Stages 1 to 3 of NIST AI 200-2 ipd.",
+  "properties": {
+    "blocks": {
+      "description": "Metrology Blocks.",
+      "items": {
+        "$ref": "#/$defs/Block"
+      },
+      "title": "Blocks",
+      "type": "array"
+    },
+    "characteristics": {
+      "description": "Characteristics (SA/TC) being evaluated.",
+      "items": {
+        "$ref": "#/$defs/Characteristic"
+      },
+      "title": "Characteristics",
+      "type": "array"
+    },
+    "events": {
+      "description": "Evidence-producing Events.",
+      "items": {
+        "$ref": "#/$defs/Event"
+      },
+      "title": "Events",
+      "type": "array"
+    },
+    "extensions": {
+      "anyOf": [
+        {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Free-form data beyond the NIST AI 200-2 ipd draft. The only place where unspecified fields are allowed.",
+      "title": "Extensions"
+    },
+    "framework_ref": {
+      "description": "Framework edition the plan follows, e.g. 'NIST AI 200-2 ipd (2026-08)'.",
+      "title": "Framework Ref",
+      "type": "string"
+    },
+    "goals": {
+      "$ref": "#/$defs/Goals",
+      "description": "Answers to the seven goal questions."
+    },
+    "id": {
+      "description": "Plan identifier.",
+      "title": "Id",
+      "type": "string"
+    },
+    "interrogation": {
+      "description": "Validity questions pre-registered before testing, answered in the review.",
+      "items": {
+        "$ref": "#/$defs/InterrogationQuestion"
+      },
+      "title": "Interrogation",
+      "type": "array"
+    },
+    "lifecycle_stage": {
+      "$ref": "#/$defs/LifecycleStage",
+      "description": "AI lifecycle stage the evaluation targets (draft Fig. 3)."
+    },
+    "spec_version": {
+      "description": "Version (semver) of the tevv-athlon spec used.",
+      "title": "Spec Version",
+      "type": "string"
+    },
+    "system": {
+      "$ref": "#/$defs/System"
+    },
+    "title": {
+      "description": "Human-readable plan title.",
+      "title": "Title",
+      "type": "string"
+    },
+    "toolbox": {
+      "description": "Tools used by the Events.",
+      "items": {
+        "$ref": "#/$defs/Tool"
+      },
+      "title": "Toolbox",
+      "type": "array"
+    }
+  },
+  "required": [
+    "spec_version",
+    "framework_ref",
+    "id",
+    "title",
+    "system",
+    "lifecycle_stage",
+    "goals"
+  ],
+  "title": "TEVV-Athlon plan (athlon.yaml)",
+  "type": "object"
+}

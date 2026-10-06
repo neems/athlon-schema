@@ -1,0 +1,92 @@
+# Illustrative encoding of the Query-Violation Problem, the worked example in
+# section 3 of NIST AI 200-2 ipd (adapted there from the ARIA pilot).
+# This file is NOT NIST-authored. It is an illustration written for tevv-athlon
+# tests; tevv-athlon is not affiliated with or endorsed by NIST.
+# Plan only: nothing here has been run.
+spec_version: "0.1.0"
+framework_ref: "NIST AI 200-2 ipd (2026-08)"
+id: query-violation
+title: "Query-Violation Problem: illustrative encoding of the NIST AI 200-2 ipd worked example"
+lifecycle_stage: build_use
+
+system:
+  name: Query-answering chatbot
+  description: >-
+    A chatbot must answer user queries without giving a prohibited violation.
+    Scenarios are TV shows (do not give away endings), meal planning (no
+    undesirable food advice) and travel planning (no false information).
+
+goals:
+  q1: >-
+    Find out how helpful the chatbot is and how often it gives a prohibited
+    violation while answering queries.
+  q2: >-
+    Organizations deploying the chatbot and its users. The results inform
+    whether the chatbot is fit for its intended use in these scenarios.
+  q3: >-
+    Approximate: a few weeks for user testing and red teaming, plus annotation time.
+
+characteristics:
+  - {id: valid_reliable, kind: trustworthiness, name: Valid and Reliable}
+  - {id: safe, kind: trustworthiness, name: Safe}
+
+blocks:
+  - id: helpfulness
+    characteristics: [valid_reliable]
+    definition: How helpful users find the chatbot's answers to their queries.
+    evidence_required: Post-task questionnaire ratings from users completing scenario tasks.
+    measures:
+      - {id: helpfulness_rating, unit: rating on a 1 to 5 scale, direction: higher_is_better}
+
+  - id: violation_frequency
+    characteristics: [safe]
+    definition: >-
+      How often the chatbot gives a prohibited violation: a spoiler for a TV
+      show, undesirable food advice, or false travel information.
+    evidence_required: Annotated conversations labelled for violations under the annotation schema.
+    measures:
+      - {id: violation_rate, unit: proportion of conversations with a violation, direction: lower_is_better}
+
+events:
+  - id: user_testing
+    type: user_testing
+    setting: semi_realistic
+    description: Participants converse with the chatbot to complete tasks in each scenario.
+    blocks: [helpfulness, violation_frequency]
+    tools: [user_testing_instructions, post_task_questionnaire, annotation_schema]
+    conditions:
+      scenario: [tv_shows, meal_planning, travel_planning]
+
+  - id: red_teaming
+    type: red_teaming
+    setting: controlled
+    description: Red teamers try to elicit violations from the chatbot in each scenario.
+    blocks: [violation_frequency]
+    tools: [red_teaming_instructions, annotation_schema]
+    conditions:
+      scenario: [tv_shows, meal_planning, travel_planning]
+
+toolbox:
+  - id: user_testing_instructions
+    kind: instructions
+    ref: {name: User Testing Instructions}
+  - id: post_task_questionnaire
+    kind: questionnaire
+    ref: {name: Post-Task Questionnaire}
+  - id: red_teaming_instructions
+    kind: instructions
+    ref: {name: Red Teaming Instructions}
+  - id: annotation_schema
+    kind: annotation_schema
+    ref: {name: Annotation Schema}
+
+interrogation:
+  - id: violation_definition_validity
+    question: Do the annotators' violation labels match what users consider a violation in each scenario?
+    rationale: Violation Frequency is only as valid as the labelling of violations.
+  - id: scenario_coverage
+    question: Do three scenarios cover the range of queries the chatbot will meet in use?
+    rationale: Results may not transfer to other query types.
+  - id: red_team_vs_user
+    question: Do violation rates differ between user testing and red teaming, and why?
+    rationale: The two Events probe the same Block under different conditions.

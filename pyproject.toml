@@ -1,0 +1,50 @@
+[project]
+name = "tevv-athlon"
+version = "0.1.0"
+description = "Open file format, JSON Schemas and validator for TEVV-Athlon AI evaluations (NIST AI 200-2 draft)"
+readme = "README.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+authors = [{ name = "Neema Shabestari" }]
+keywords = ["ai-evaluation", "tevv", "nist", "json-schema", "ai-rmf"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = ["pydantic>=2", "typer", "pyyaml", "jsonschema"]
+
+[project.urls]
+Repository = "https://github.com/neems/athlon-schema"
+Schemas = "https://neems.github.io/athlon-schema/"
+
+[project.scripts]
+tevv-athlon = "tevv_athlon.cli:app"
+
+[dependency-groups]
+dev = ["pytest", "ruff", "pyright", "check-jsonschema", "types-pyyaml", "types-jsonschema"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/tevv_athlon"]
+
+# Allowlist: ship only the public sources, never untracked local files
+[tool.hatch.build.targets.sdist]
+include = ["/src", "/spec", "/tests", "/examples", "/README.md", "/LICENSE", "/uv.lock"]
+
+[tool.ruff]
+line-length = 100
+
+[tool.pyright]
+include = ["src"]
+typeCheckingMode = "basic"
